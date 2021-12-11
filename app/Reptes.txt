@@ -1,0 +1,36 @@
+---------------------------- Reptes -------------------------
+
+- Cavall ----------------------------------------------------
+
+Pros: Repte amb menys participació (possiblement)
+Cons: Tot front
+
+Puntuacio: X(5), D(0), S(). Mitjana:
+
+
+- Proteines -------------------------------------------------
+
+Pros: soms uns crucks en això :)
+Cons: no s'apren "gaire", s'ha de buscar info (algoritmes, mètriques)
+
+Puntuacio: X(7), D(6), S(). Mitjana:
+
+
+- Planificador ----------------------------------------------
+
+Pros: 50/50 frontback,
+Cons: poc original,
+
+Puntuacio: X(8), D(9), S(). Mitjana:
+
+
+- M'estimo molt (Oques) -------------------------------------
+
+Pros: creativitat, sentiment analysis (NLP), analisi imatges
+Cons: definir objectius clars, sensació de poder fer més
+
+Puntuacio: X(6.5), D(6), S(). Mitjana:
+
+
+##############################################################################################################################
+0: per fer aquest projecte no participo   -->    5:ni m'interessa ni em molesta   -->    10: em rallaré si no faig aquest tema
