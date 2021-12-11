@@ -11,8 +11,6 @@ class Task():
         self.subject = subject
         self.name = name
         self.date_time = datetime.datetime.strptime(date + " " + start_time, '%Y/%m/%d %H:%M')
-        self.date = date
-        self.start_time = start_time
         self.end_time = end_time
         self.dedication = dedication
         self.finished = False

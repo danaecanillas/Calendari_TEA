@@ -34,9 +34,9 @@ class Calendar():
         # (Forma de treballar preferida: fer una mateixa tasca durant hores o alternar tasques)
 
 
-    def add_to_calendar(self, date_schedule, t):
-        str_date = datetime.datetime.strftime(date_schedule, '%Y/%m/%d')
-        str_clock = datetime.datetime.strftime(date_schedule, '%H:%M')
+    def add_to_calendar(self, t):
+        str_date = datetime.datetime.strftime(t.date_time, '%Y/%m/%d')
+        str_clock = datetime.datetime.strftime(t.date_time, '%H:%M')
         if not str_date in self.schedule.keys():
             self.schedule[str_date] = {}
         self.schedule[str_date][str_clock] = t
@@ -66,11 +66,11 @@ class Calendar():
         while not self.exam_queue.empty():
             # print("mida cua exam", self.exam_queue.qsize())
             _, t = self.exam_queue.get()
-            print("selected exam is", t.name, "pending hours:", t.dedication)
+            # print("selected exam is", t.name, "pending hours:", t.dedication)
             date_schedule = min(date_schedule, t.date_time-datetime.timedelta(hours = 1))
             possible = False
             while date_schedule > now and not possible:
-                print(date_schedule)
+                # print(date_schedule)
                 date_schedule -= datetime.timedelta(hours = 1)
                 possible = self.free_weekly_slot(date_schedule) and self.free_calendar_slot(date_schedule)
             if not possible:
@@ -80,22 +80,21 @@ class Calendar():
                 sub_t = deepcopy(t)
                 sub_t.activity_type = "Estudi"
                 sub_t.dedication = 1
-                self.add_to_calendar(date_schedule, sub_t)
+                sub_t.date_time = date_schedule
+                self.add_to_calendar(sub_t)
 
                 t.dedication -= 1
-                print("dedication after subtask", t.dedication)
                 if t.dedication != 0:
                     self.add_to_queue(t)
 
 
     def set_project_schedule(self):
         now = datetime.datetime.now()
-        date_schedule = now.replace(second=0, microsecond=0, minute=0, hour=now.hour) + datetime.timedelta(hours=1)
+        date_schedule = now.replace(second=0, microsecond=0, minute=0, hour=now.hour)
 
         while not self.project_queue.empty():
             _, t = self.project_queue.get()
-            print("selected project is", t.name, "pending hours:", t.dedication)
-            # date_schedule = min(date_schedule, t.date_time)
+            # print("selected project is", t.name, "pending hours:", t.dedication)
             possible = False
             while date_schedule < t.date_time and not possible:
                 date_schedule += datetime.timedelta(hours = 1)
@@ -107,7 +106,8 @@ class Calendar():
                 sub_t = deepcopy(t)
                 sub_t.activity_type = "Fer treball"
                 sub_t.dedication = 1
-                self.add_to_calendar(date_schedule, sub_t)
+                sub_t.date_time = date_schedule
+                self.add_to_calendar(sub_t)
 
                 t.dedication -= 1
                 if t.dedication != 0:
@@ -120,11 +120,10 @@ class Calendar():
     
 
     def add_to_queue(self, t):
-        date_time = datetime.datetime.strptime(t.date + " " + t.start_time, '%Y/%m/%d %H:%M')
         if t.activity_type == "Examen":
-            self.exam_queue.put((-date_time.timestamp(), t))
+            self.exam_queue.put((-t.date_time.timestamp(), t))
         elif t.activity_type == "Projecte":
-            self.project_queue.put((date_time.timestamp(), t))
+            self.project_queue.put((t.date_time.timestamp(), t))
 
 
     def add_deadline(self, subject, activity_type, name, date, start_time, end_time=None, dedication=None):
@@ -133,8 +132,7 @@ class Calendar():
         if not dedication:
             dedication = self.default_time[activity_type]
         t = Task(self.subject_list, subject, activity_type, name, date, start_time, end_time, dedication)
-        date_schedule = datetime.datetime.strptime(date + " " + start_time, '%Y/%m/%d %H:%M')
-        self.add_to_calendar(date_schedule, t)
+        self.add_to_calendar(t)
         self.add_to_queue(t)
         if self.auto_schedule:
             self.set_schedule()
