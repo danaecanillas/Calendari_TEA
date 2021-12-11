@@ -132,7 +132,7 @@ def render_content(tab):
                 html.Div([
                     html.Div([dcc.Interval(id='interval1', interval=1000, n_intervals=0),html.Br(),html.H1(id='label1', children='',style={ 'textAlign': 'center', 'color': 'black'})]),
                     dcc.Graph(id='TIME'),html.Img(src=b64_image("img/estudi.png"), style={'height':'30%'})], style={'width':'60%','text-align':'center'})],style={'display':'flex'}
-                )])
+                ),html.Div()])
                 
     elif tab == 'add_task':
         return tasks.tasks_tab()
