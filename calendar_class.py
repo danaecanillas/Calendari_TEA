@@ -33,6 +33,7 @@ class Calendar():
         self.default_time = {"Examen": 30, "Projecte": 20}
         self.exam_queue = PriorityQueue()
         self.project_queue = PriorityQueue()
+        self.deadlines = PriorityQueue()
         self.auto_schedule = False
         
 
@@ -145,6 +146,7 @@ class Calendar():
         t = Task(self.subject_list, subject, activity_type, name, date, start_time, end_time, dedication)
         self.add_to_calendar(t)
         self.add_to_queue(t)
+        self.deadlines.put((t.date_time.timestamp(), t))
         if self.auto_schedule:
             self.set_schedule()
             
@@ -152,6 +154,18 @@ class Calendar():
     def get_schedule(self):
         return self.schedule
 
+
+    def get_next_deadlines(self):
+        deadlines_list = []
+        while not self.deadlines.empty() and len(deadlines_list) < 10:
+            _, t = self.exam_queue.get()
+            deadlines_list.append(t)
+
+        for t in deadlines_list:
+            self.deadlines.put((t.date_time.timestamp(), t))
+        
+        return deadlines_list
+        
 
     def save_profile(self):
         if not os.path.exists(self.profile_folder):
