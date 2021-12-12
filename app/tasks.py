@@ -1,6 +1,6 @@
 import dash_html_components as html
 import dash_core_components as dcc
-import aux
+import aux_ as aux
 import dash
 from dash.dependencies import Input, Output
 
@@ -59,7 +59,7 @@ def tasks_tab():
                         placeholder="Escriu el nom de la tasca",
                         className="oper__input",
                     ),],
-                        className="input__container",
+                        className="dropdown__container",
                     ),
                 html.Div([
                     html.P(
@@ -73,7 +73,7 @@ def tasks_tab():
                         placeholder="Introdueix el número d'hores de dedicació",
                         className="vol__input",
                     ),],
-                        className="input__container",
+                        className="dropdown__container",
                     ),
                 html.Div([
                     html.P(
@@ -100,25 +100,20 @@ def tasks_tab():
                         id="enter-time",
                         value="00:00",
                         placeholder="Enter Time (HH:MM)",
-                        className="time__input",
+                        className="dropdown__container",
                     ),
                 ],
-                            className="input__container",
+                        className="input__container",
                         ),
+                html.Br(),html.Br(),
                 html.Div([
                     html.Button(
-                        "Registre",
+                        "Afegeix",
                         id="submit-entry",
                         className="submit__button",
                     )
                 ]
-                )],
+                )],style={'marginLeft': "15%",'marginRight': "15%",'marginTop': "5%"},
                         className="input__container",
                     ))
 
-
-def register(submit_entry, select_subject, select_activity, enter_task, enter_hours,date_picker, enter_time):
-    if submit_entry:
-        print(submit_entry, select_subject, select_activity, enter_task, enter_hours,date_picker, enter_time)
-        return "today"
-    raise dash.exceptions.PreventUpdate
