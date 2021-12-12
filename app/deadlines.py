@@ -4,13 +4,14 @@ import aux_ as aux
 import dash
 from dash.dependencies import Input, Output
 
-from datetime import date
+import datetime 
 
 def deadlines_tab(calendar):
     res = []
     deadlines = calendar.get_next_deadlines()
     for lliurament in deadlines:
-        res.append(html.P("-" + lliurament, style={'marginLeft': "2%"}))
+        str_clock = datetime.datetime.strftime(lliurament.date_time, '%H:%M')
+        res.append(html.P("- " + lliurament.name + " ("+ str(lliurament.date_time.date()) + " " + str_clock +")", style={'marginLeft': "2%"}))
 
     print(res)
 

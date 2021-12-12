@@ -1,6 +1,5 @@
 # Dash
 import dash
-from dash_core_components.Tabs import Tabs
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
@@ -215,7 +214,7 @@ def render_content(tab):
     elif tab == 'profile':
         return profile.profile_tab()
     elif tab == 'deadlines':
-        return deadlines.deadlines_tab()
+        return deadlines.deadlines_tab(calendar)
 
 if __name__ == '__main__':
     app.run_server(debug=True)
