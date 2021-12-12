@@ -21,7 +21,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # import ../db.py
 from calendar_class import Calendar
 
-calendar = Calendar("Simo")
+calendar = Calendar("Simon")
 calendar.auto_schedule = True
 now = datetime.datetime.now()
 #now += datetime.timedelta(hours=3)
@@ -191,7 +191,7 @@ def render_content(tab):
         for hour in hours:
             task = day_tasks[hour]
         # for hour, task in day_tasks.items():
-            lst.append( html.Div([html.Button(hour + " - "+ task.name, id=str(task.date_time),style=normal_button_style),html.Br(),html.Br()]))
+            lst.append( html.Div([html.Button(hour + " | "+ task.name + " - "+ task.subject, id=str(task.date_time),style=normal_button_style),html.Br(),html.Br()]))
         print("mida lst", len(lst))
 
         ACTIVITAT = []
