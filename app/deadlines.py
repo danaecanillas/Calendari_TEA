@@ -17,7 +17,7 @@ def deadlines_tab(calendar):
 
     return dcc.Tab(html.Div([html.Br(),
                     html.H2(
-                        "Propers lliuraments i examens:",style={'marginLeft': "2%"}
+                        "Propers lliuraments i exàmens:",style={'marginLeft': "2%"}
                     )] + res + [html.Br()],style={'marginLeft': "15%",'marginRight': "15%",'marginTop': "5%",'background-color':'rgb(240,240,240)'},
                         className="input__container",
                     ))

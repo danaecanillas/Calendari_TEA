@@ -45,7 +45,7 @@ app.layout =  html.Div([html.Br(),html.Div([html.H1(aux.APP_TITLE)],style={'text
         dcc.Tabs(id="tabs-styled-with-inline", value='today', children=[
         dcc.Tab(label='Què he de fer avui?', value='avui', style=aux.tab_style, selected_style=aux.tab_selected_style),
         dcc.Tab(label='Afegeix tasca', value='add_task', style=aux.tab_style, selected_style=aux.tab_selected_style),
-        dcc.Tab(label='Lliuraments i examens', value='deadlines', style=aux.tab_style, selected_style=aux.tab_selected_style),
+        dcc.Tab(label='Lliuraments i exàmens', value='deadlines', style=aux.tab_style, selected_style=aux.tab_selected_style),
         dcc.Tab(label='El meu perfil', value='profile', style=aux.tab_style, selected_style=aux.tab_selected_style),
     ], style=aux.tabs_styles),
    html.Div(id='tabs-content-inline')
