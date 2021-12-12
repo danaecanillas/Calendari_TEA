@@ -37,7 +37,7 @@ class Calendar():
         
 
     def set_default_profile(self):
-        self.subject_list = ["PIE2", "SiS", "POE"]
+        self.subject_list = ["TFG", "PE", "TAED1", "POE", "PIVA"]
         a = np.zeros((24, 7))
         a[15:21, 0:5] = True
         a[9:13, 5:7] = a[16:20, 5:7] = True
