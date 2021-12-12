@@ -3,35 +3,46 @@ import datetime
 from queue import PriorityQueue
 import numpy as np
 from copy import deepcopy
+import pickle
+import os.path
 
 from task_class import Task
 
 
 class Calendar():
-    def __init__(self, form):
+    def __init__(self, profile=None):
         '''
-        form: information about the user. Available hours for every day
+        profile: name of the person
         '''
-        # self.weekly_schedule = {}
-        # self.weekly_schedule = {"Mon": [(time, ), ()]}
-        a = np.zeros((24, 7))
-        a[15:21, 0:5] = True
-        a[9:13, 5:7] = True
-        a[16:20, 5:7] = True
-        self.weekly_schedule = a
-        self.schedule = {}
-        self.subject_list = ["POE", "PIVA"]
-        self.subjects = {}
+        dir_folder = os.path.dirname(__file__)
+        if profile:
+            self.profile_folder = f'{dir_folder}/perfils/{profile}/'
+            if os.path.exists(self.profile_folder):
+                with open(f'{self.profile_folder}subject_list.pickle', 'rb') as f:
+                    self.subject_list = pickle.load(f)
+                with open(f'{self.profile_folder}weekly_schedule.pickle', 'rb') as f:
+                    self.weekly_schedule = pickle.load(f)
+                with open(f'{self.profile_folder}schedule.pickle', 'rb') as f:
+                    self.schedule = pickle.load(f)
+            else:
+                self.set_default_profile()
+        else:
+            self.set_default_profile()
+
         self.activity_types = ["Examen", "Projecte", "Estudi", "Fer treball"]
         self.default_time = {"Examen": 30, "Projecte": 20}
         self.exam_queue = PriorityQueue()
         self.project_queue = PriorityQueue()
         self.auto_schedule = False
-        # self.exams = {}
-        # self.projects = {}
-        # Disponibilitat/ocupació
-        # (Preferències: prefereixo no treballar els dmg)
-        # (Forma de treballar preferida: fer una mateixa tasca durant hores o alternar tasques)
+        
+
+    def set_default_profile(self):
+        self.subject_list = ["PIE2", "SiS", "POE"]
+        a = np.zeros((24, 7))
+        a[15:21, 0:5] = True
+        a[9:13, 5:7] = a[16:20, 5:7] = True
+        self.weekly_schedule = a
+        self.schedule = {}
 
 
     def add_to_calendar(self, t):
@@ -140,3 +151,17 @@ class Calendar():
     
     def get_schedule(self):
         return self.schedule
+
+
+    def save_profile(self):
+        if not os.path.exists(self.profile_folder):
+            os.mkdir(self.profile_folder)
+
+        with open(f'{self.profile_folder}subject_list.pickle', 'wb') as f:
+            pickle.dump(self.subject_list, f, pickle.HIGHEST_PROTOCOL)
+        
+        with open(f'{self.profile_folder}weekly_schedule.pickle', 'wb') as f:
+            pickle.dump(self.weekly_schedule, f, pickle.HIGHEST_PROTOCOL)
+
+        with open(f'{self.profile_folder}schedule.pickle', 'wb') as f:
+            pickle.dump(self.schedule, f, pickle.HIGHEST_PROTOCOL)
