@@ -77,7 +77,7 @@ def tasks_tab():
                     ),
                 html.Div([
                     html.P(
-                        "Deadline:",
+                        "Dia:",
                         className="input__heading",
                     ),
                     dcc.DatePickerSingle(
@@ -93,7 +93,7 @@ def tasks_tab():
                 ),
                 html.Div([
                     html.P(
-                        "Time (HH:MM)",
+                        "Hora (HH:MM)",
                         className="input__heading",
                     ),
                     dcc.Input(

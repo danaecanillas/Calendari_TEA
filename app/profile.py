@@ -19,15 +19,10 @@ horari = {}
 for dia in dies:
     horari[dia] = hores
 
-def b64_image(image_filename):
-    with open(image_filename, 'rb') as f:
-        image = f.read()
-    return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
-
 def profile_tab():
     lst=[]
     i = 0
-    lst.append(html.Div([html.Div([html.H2("Disponibilitat horària")], style = {'display': 'inline-block','padding':"70px"}),html.Div([html.Img(src=b64_image("img/horari.png"),style = {'height':'150px'})], style = {'display': 'inline-block'})], style = {'display': 'inline-block','text-align':'right'}))
+    lst.append(html.Div([html.H2("Disponibilitat horària")], style = {'text-align':'right','marginLeft': "20%",'marginRight': "20%"}))
     for dia, hores in horari.items():
         lst.append(html.H3(DIES[i]))
         for hora in hores:   
