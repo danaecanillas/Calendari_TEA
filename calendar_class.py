@@ -10,9 +10,9 @@ from task_class import Task
 
 
 class Calendar():
-    def __init__(self, profile="M"):
+    def __init__(self, profile=None):
         '''
-        path: path where information is saved
+        profile: name of the person
         '''
         dir_folder = os.path.dirname(__file__)
         if profile:
@@ -25,24 +25,24 @@ class Calendar():
                 with open(f'{self.profile_folder}schedule.pickle', 'rb') as f:
                     self.schedule = pickle.load(f)
             else:
-                os.mkdir(self.profile_folder)
-                self.subject_list = ["PIE2", "SiS", "POE"]
-                a = np.zeros((24, 7))
-                a[15:21, 0:5] = True
-                a[9:13, 5:7] = a[16:20, 5:7] = True
-                self.weekly_schedule = a
-                self.schedule = {}            
+                self.set_default_profile()
+        else:
+            self.set_default_profile()
 
         self.activity_types = ["Examen", "Projecte", "Estudi", "Fer treball"]
         self.default_time = {"Examen": 30, "Projecte": 20}
         self.exam_queue = PriorityQueue()
         self.project_queue = PriorityQueue()
         self.auto_schedule = False
-        # self.exams = {}
-        # self.projects = {}
-        # Disponibilitat/ocupació
-        # (Preferències: prefereixo no treballar els dmg)
-        # (Forma de treballar preferida: fer una mateixa tasca durant hores o alternar tasques)
+        
+
+    def set_default_profile(self):
+        self.subject_list = ["PIE2", "SiS", "POE"]
+        a = np.zeros((24, 7))
+        a[15:21, 0:5] = True
+        a[9:13, 5:7] = a[16:20, 5:7] = True
+        self.weekly_schedule = a
+        self.schedule = {}
 
 
     def add_to_calendar(self, t):
@@ -154,6 +154,9 @@ class Calendar():
 
 
     def save_profile(self):
+        if not os.path.exists(self.profile_folder):
+            os.mkdir(self.profile_folder)
+
         with open(f'{self.profile_folder}subject_list.pickle', 'wb') as f:
             pickle.dump(self.subject_list, f, pickle.HIGHEST_PROTOCOL)
         
