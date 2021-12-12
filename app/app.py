@@ -21,10 +21,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # import ../db.py
 from calendar_class import Calendar
 
-calendar = Calendar("Danae")
+calendar = Calendar("Simo")
 calendar.auto_schedule = True
 now = datetime.datetime.now()
-now += datetime.timedelta(hours=3)
+#now += datetime.timedelta(hours=3)
 str_date = datetime.datetime.strftime(now, '%Y/%m/%d')
 
 fruits = {
@@ -78,7 +78,7 @@ def register(submit_entry, select_subject, select_activity, enter_task, enter_ho
     [dash.dependencies.Input('interval1', 'n_intervals')])
 def update_interval(n):
     now = datetime.datetime.now()
-    now += datetime.timedelta(hours=3)
+    #now += datetime.timedelta(hours=3)
     return str(now.strftime("%H:%M:%S"))
 
 red_button_style = {'background-color': 'red',
