@@ -158,7 +158,7 @@ class Calendar():
     def get_next_deadlines(self):
         deadlines_list = []
         while not self.deadlines.empty() and len(deadlines_list) < 10:
-            _, t = self.exam_queue.get()
+            _, t = self.deadlines.get()
             deadlines_list.append(t)
 
         for t in deadlines_list:
