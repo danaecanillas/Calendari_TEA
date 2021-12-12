@@ -11,6 +11,7 @@ import base64
 import aux_ as aux
 
 import tasks 
+import profile
 import datetime
 
 import pandas as pd
@@ -20,10 +21,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # import ../db.py
 from calendar_class import Calendar
 
-calendar = Calendar()
+calendar = Calendar("Danae")
 calendar.auto_schedule = True
 now = datetime.datetime.now()
-now += datetime.timedelta(hours=6)
+now += datetime.timedelta(hours=3)
 str_date = datetime.datetime.strftime(now, '%Y/%m/%d')
 
 fruits = {
@@ -76,7 +77,7 @@ def register(submit_entry, select_subject, select_activity, enter_task, enter_ho
     [dash.dependencies.Input('interval1', 'n_intervals')])
 def update_interval(n):
     now = datetime.datetime.now()
-    now += datetime.timedelta(hours=6)
+    now += datetime.timedelta(hours=3)
     return str(now.strftime("%H:%M:%S"))
 
 red_button_style = {'background-color': 'red',
@@ -140,16 +141,34 @@ def time_clock(time):
         fig = px.pie(df, hover_name="Etiqueta", hover_data={'Etiqueta':False,'Percentatge':False}, values='Percentatge', names='Etiqueta', color_discrete_sequence=["#00CC96","rgb(246,246,246)"])
         fig.update(layout_showlegend=False)
         fig.update_traces(textinfo='none',sort=False)
-        return fig, [html.H2(day_tasks[hour+":00"].activity_type),html.Div("De " + hour+":00" + " a " + str(int(hour)+1) +":00 cal fer:",style={'fontSize':20}), html.Br(), html.Div("- Activitat: " + day_tasks[hour+":00"].name,style={'fontSize':20}), html.Div("- Assignatura: " + day_tasks[hour+":00"].subject,style={'fontSize':20}),html.Br()]
+        return fig, [html.Div([html.Div([ret_img(day_tasks[hour+":00"].activity_type)],style={'width':'40%'}),html.Div([html.H2(day_tasks[hour+":00"].activity_type),html.Div("De " + hour+":00" + " a " + str(int(hour)+1) +":00 cal fer:",style={'fontSize':20}), html.Br(), html.Div("- Activitat: " + day_tasks[hour+":00"].name,style={'fontSize':20}), html.Div("- Assignatura: " + day_tasks[hour+":00"].subject,style={'fontSize':20}),html.Br()],style={'width':'60%','text-align':'center'})],style={'display':'flex'})]
     else:
-        data = [['% Completat', 100],['% Pendent', 0]]
+        data = [['% Completat', 0],['% Pendent', 100]]
         df = pd.DataFrame(data,columns = ['Etiqueta', 'Percentatge'])
-        fig = px.pie(df, hover_data={'Etiqueta':False,'Percentatge':False}, values='Percentatge', names='Etiqueta', color_discrete_sequence=["#00CC96","rgb(246,246,246)"])
+        fig = px.pie(df, hover_data={'Etiqueta':False,'Percentatge':False}, values='Percentatge', names='Etiqueta', color_discrete_sequence=["#00CC96","rgb(256,256,256)"])
         fig.update(layout_showlegend=False)
         fig.update_traces(textinfo='none',sort=False)
         return fig, html.Div("No tens cap activitat programada durant aquesta hora",style={'fontSize':20})
 
+for dia, hores in profile.horari.items():
+        for hora in hores: 
+            @app.callback(Output('%s' % dia+hora, 'style'), [Input('%s' % dia+hora, 'n_clicks')])
+            def change_button_style(n_clicks):
+                if n_clicks%2 != 0:
+                    return red_button_style
+                else:
+                    return normal_button_style
 
+def ret_img(activity_type):
+    "Examen", "Projecte", "Estudi", "Fer treball"
+    if activity_type == "Examen":
+        return html.Img(src=aux.b64_image("img/examen.png"),style={'width':'60%','text-align':'center'})
+    elif activity_type == "Projecte":
+        return html.Img(src=aux.b64_image("img/treball.png"),style={'width':'60%','text-align':'center'})
+    elif activity_type == "Estudi":
+        return html.Img(src=aux.b64_image("img/estudi.png"),style={'width':'60%','text-align':'center'})
+    else:
+        return html.Img(src=aux.b64_image("img/feina.png"),style={'width':'60%','text-align':'center'})
 # MAIN
 @app.callback(Output('tabs-content-inline', 'children'),
               Input('tabs-styled-with-inline', 'value'))
@@ -192,7 +211,7 @@ def render_content(tab):
     elif tab == 'add_task':
         return tasks.tasks_tab()
     elif tab == 'profile':
-        return 
+        return profile.profile_tab()
 
 if __name__ == '__main__':
     app.run_server(debug=True)
