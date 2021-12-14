@@ -19,6 +19,8 @@ class Task():
     def finish(self):
         self.finished = True
 
-    
+
     def __gt__(self, other):
-        return self.dedication < other.dedication
+        if self.activity_type == other.activity_type:
+            return ((self.activity_type=="Projecte")*2-1)*self.date_time.timestamp() > ((other.activity_type=="Projecte")*2-1)*other.date_time.timestamp()
+        return self.date_time.timestamp() > other.date_time.timestamp()

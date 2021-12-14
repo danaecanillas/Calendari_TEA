@@ -76,13 +76,13 @@ class Calendar():
         now = datetime.datetime.now()
 
         if not self.exam_queue.empty():
-            _, t = self.exam_queue.get()
+            t = self.exam_queue.get()
             date_schedule = t.date_time # date of the last exam
             self.add_to_queue(t)
 
         while not self.exam_queue.empty():
             # print("mida cua exam", self.exam_queue.qsize())
-            _, t = self.exam_queue.get()
+            t = self.exam_queue.get()
             # print("selected exam is", t.name, "pending hours:", t.dedication)
             date_schedule = min(date_schedule, t.date_time-datetime.timedelta(hours = 1))
             possible = False
@@ -110,7 +110,7 @@ class Calendar():
         date_schedule = now.replace(second=0, microsecond=0, minute=0, hour=now.hour)
 
         while not self.project_queue.empty():
-            _, t = self.project_queue.get()
+            t = self.project_queue.get()
             # print("selected project is", t.name, "pending hours:", t.dedication)
             possible = False
             while date_schedule < t.date_time and not possible:
@@ -138,9 +138,9 @@ class Calendar():
 
     def add_to_queue(self, t):
         if t.activity_type == "Examen":
-            self.exam_queue.put((-t.date_time.timestamp(), t))
+            self.exam_queue.put(t)
         elif t.activity_type == "Projecte":
-            self.project_queue.put((t.date_time.timestamp(), t))
+            self.project_queue.put(t)
 
 
     def add_deadline(self, subject, activity_type, name, date, start_time, end_time=None, dedication=None):
@@ -151,7 +151,7 @@ class Calendar():
         t = Task(self.subject_list, subject, activity_type, name, date, start_time, end_time, dedication)
         self.add_to_calendar(t)
         self.add_to_queue(t)
-        self.deadlines.put((t.date_time.timestamp(), t))
+        self.deadlines.put(t)
         if self.auto_schedule:
             self.set_schedule()
             
