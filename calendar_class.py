@@ -183,4 +183,4 @@ class Calendar():
             pickle.dump(self.schedule, f, pickle.HIGHEST_PROTOCOL)
 
         with open(f'{self.profile_folder}deadlines.pickle', 'wb') as f:
-            pickle.dump(self.get_deadlines(), f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self.get_deadline_list(), f, pickle.HIGHEST_PROTOCOL)

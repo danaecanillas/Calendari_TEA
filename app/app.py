@@ -24,7 +24,6 @@ from calendar_class import Calendar
 calendar = Calendar("Simon")
 calendar.auto_schedule = True
 now = datetime.datetime.now()
-#now += datetime.timedelta(hours=3)
 str_date = datetime.datetime.strftime(now, '%Y/%m/%d')
 
 fruits = {
@@ -78,7 +77,6 @@ def register(submit_entry, select_subject, select_activity, enter_task, enter_ho
     [dash.dependencies.Input('interval1', 'n_intervals')])
 def update_interval(n):
     now = datetime.datetime.now()
-    #now += datetime.timedelta(hours=3)
     return str(now.strftime("%H:%M:%S"))
 
 red_button_style = {'background-color': 'red',
@@ -192,15 +190,12 @@ def render_content(tab):
             task = day_tasks[hour]
         # for hour, task in day_tasks.items():
             lst.append( html.Div([html.Button(hour + " | "+ task.name + " - "+ task.subject, id=str(task.date_time),style=normal_button_style),html.Br(),html.Br()]))
-        print("mida lst", len(lst))
 
         ACTIVITAT = []
 
         time = str(now.strftime("%H:%M:%S"))[0:2]
         hour = time+":00"
 
-        if hour in day_tasks.keys():
-            print(hour)
 
         return  [html.Div([html.Div([
                 html.Div([html.Div([html.H2("Les tasques d'avui:"),html.Div(lst)], style={'marginLeft': "5%",'marginRight': "5%"})], style={'width':'40%','text-align':'left','backgroundColor': 'rgb(153,153,153)','marginTop': 22,'marginLeft': 10}),
