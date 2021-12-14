@@ -24,6 +24,11 @@ class Calendar():
                     self.weekly_schedule = pickle.load(f)
                 with open(f'{self.profile_folder}schedule.pickle', 'rb') as f:
                     self.schedule = pickle.load(f)
+                with open(f'{self.profile_folder}deadlines.pickle', 'rb') as f:
+                    self.deadlines = PriorityQueue()
+                    deadlines = pickle.load(f)
+                    for deadline in deadlines:
+                        self.deadlines.put(deadline)
             else:
                 self.set_default_profile()
         else:
@@ -33,7 +38,6 @@ class Calendar():
         self.default_time = {"Examen": 30, "Projecte": 20}
         self.exam_queue = PriorityQueue()
         self.project_queue = PriorityQueue()
-        self.deadlines = PriorityQueue()
         self.auto_schedule = False
         
 
@@ -44,6 +48,7 @@ class Calendar():
         a[9:13, 5:7] = a[16:20, 5:7] = True
         self.weekly_schedule = a
         self.schedule = {}
+        self.deadlines = PriorityQueue()
 
 
     def add_to_calendar(self, t):
@@ -155,16 +160,13 @@ class Calendar():
         return self.schedule
 
 
-    def get_next_deadlines(self):
-        deadlines_list = []
-        while not self.deadlines.empty() and len(deadlines_list) < 10:
-            _, t = self.deadlines.get()
-            deadlines_list.append(t)
+    def get_deadline_list(self):
+        return self.deadlines.queue
 
-        for t in deadlines_list:
-            self.deadlines.put((t.date_time.timestamp(), t))
-        
-        return deadlines_list
+
+    def get_next_deadlines(self):
+        deadlines = self.get_deadline_list()
+        return deadlines[:10]
         
 
     def save_profile(self):
@@ -179,3 +181,6 @@ class Calendar():
 
         with open(f'{self.profile_folder}schedule.pickle', 'wb') as f:
             pickle.dump(self.schedule, f, pickle.HIGHEST_PROTOCOL)
+
+        with open(f'{self.profile_folder}deadlines.pickle', 'wb') as f:
+            pickle.dump(self.get_deadlines(), f, pickle.HIGHEST_PROTOCOL)
