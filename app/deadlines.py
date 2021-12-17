@@ -12,7 +12,6 @@ def deadlines_tab(calendar):
     for lliurament in deadlines:
         str_clock = datetime.datetime.strftime(lliurament.date_time, '%H:%M')
         res.append(html.P("- " + lliurament.name + " ("+ str(lliurament.date_time.date()) + " " + str_clock +")", style={'marginLeft': "2%"}))
-
     print(res)
 
     return dcc.Tab(html.Div([html.Br(),
