@@ -47,34 +47,42 @@ ended_button_style ={
 
 # Aux functions
 def b64_image(image_filename):
+    '''
+    This functions codes the image so it can be read by dash
+    - image_filename: path of the image (string)
+    '''
     with open(image_filename, 'rb') as f:
         image = f.read()
     return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
 
-def state(hour,day_tasks):
-    res = []
-    for time in day_tasks.keys():
-        time = time[0:2]
-        if hour == time:
-            res.append(red_button_style)
-        elif hour < time:
-            res.append(normal_button_style)
-        elif hour > time:
-            res.append(ended_button_style)
-    return res
+# def state(hour,day_tasks):
+#     res = []
+#     for time in day_tasks.keys():
+#         time = time[0:2]
+#         if hour == time:
+#             res.append(red_button_style)
+#         elif hour < time:
+#             res.append(normal_button_style)
+#         elif hour > time:
+#             res.append(ended_button_style)
+#     return res
 
-def get_first_task(now,day_tasks):
-    time = str(now.strftime("%H:%M:%S"))[0:2]
-    hour = time+":00"
-    if len(day_tasks.keys()) == 0:
-        print(day_tasks)
-        return "blu"
-    else:
-        if hour in day_tasks.keys():
-            return str(day_tasks[hour].date_time)
+# def get_first_task(now,day_tasks):
+#     time = str(now.strftime("%H:%M:%S"))[0:2]
+#     hour = time+":00"
+#     if len(day_tasks.keys()) == 0:
+#         print(day_tasks)
+#         return "blu"
+#     else:
+#         if hour in day_tasks.keys():
+#             return str(day_tasks[hour].date_time)
 
 
 def ret_img(activity_type):
+    '''
+    This function returns the image related to the inputted activity type
+    - activity_type: string
+    '''
     "Examen", "Projecte", "Estudi", "Fer treball"
     if activity_type == "Examen":
         return html.Img(

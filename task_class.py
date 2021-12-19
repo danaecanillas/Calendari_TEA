@@ -3,6 +3,16 @@ import datetime
 
 class Task():
     def __init__(self, subject_list, subject, activity_type, name, date, start_time, end_time = None, dedication = None):
+        '''
+        This function adds a study deadline or exam to the system (it adds it to calendar and to the queues)
+        - subject: string
+        - activity_type: exam/project (string)
+        - name: string
+        - date: string
+        - start_time: string
+        - end_time: string
+        - dedication: number of hours needed for the deadline (integer)
+        '''
         if activity_type not in ["Examen", "Projecte", "Estudi", "Fer treball"]:
             raise Exception(f"Not a correct activity")
         self.activity_type = activity_type

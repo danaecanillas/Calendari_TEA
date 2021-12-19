@@ -12,7 +12,7 @@ from task_class import Task
 class Calendar():
     def __init__(self, profile=None):
         '''
-        profile: name of the person
+        profile: name of the person (string)
         '''
         dir_folder = os.path.dirname(__file__)
         if profile:
@@ -42,7 +42,10 @@ class Calendar():
         
 
     def set_default_profile(self):
-        self.subject_list = ["TFG", "PE", "TAED1", "POE", "PIVA"]
+        '''
+        This function sets the default parameters for a new profile
+        '''
+        self.subject_list = ["TFG", "PE", "TAED1", "POE", "PIVA"] # to be changed
         a = np.zeros((24, 7))
         a[15:21, 0:5] = True
         a[9:13, 5:7] = a[16:20, 5:7] = True
@@ -52,6 +55,10 @@ class Calendar():
 
 
     def add_to_calendar(self, t):
+        '''
+        This function adds task t to self.schedule
+        - t: task to be added (Task)
+        '''
         str_date = datetime.datetime.strftime(t.date_time, '%Y/%m/%d')
         str_clock = datetime.datetime.strftime(t.date_time, '%H:%M')
         if not str_date in self.schedule.keys():
@@ -60,6 +67,10 @@ class Calendar():
 
 
     def free_weekly_slot(self, date_schedule):
+        '''
+        This function tells whether date_schedule is free in the weekly calendar
+        - date_schedule: time slot (datetime.datetime)
+        '''
         date = date_schedule.date()
         week_day = date.weekday()
         int_hour = int(datetime.datetime.strftime(date_schedule, '%H'))
@@ -67,12 +78,19 @@ class Calendar():
 
 
     def free_calendar_slot(self, date_schedule):
+        '''
+        This function tells whether date_schedule is free in the calendar
+        - date_schedule: time slot (datetime.datetime)
+        '''
         str_date = datetime.datetime.strftime(date_schedule, '%Y/%m/%d')
         str_clock = datetime.datetime.strftime(date_schedule, '%H:%M')
         return str_date not in self.schedule.keys() or str_clock not in self.schedule[str_date].keys()
 
 
     def set_exam_schedule(self):
+        '''
+        This function sets study times in the calendar
+        '''
         now = datetime.datetime.now()
 
         if not self.exam_queue.empty():
@@ -106,6 +124,9 @@ class Calendar():
 
 
     def set_project_schedule(self):
+        '''
+        This function sets project work times in the calendar
+        '''
         now = datetime.datetime.now()
         date_schedule = now.replace(second=0, microsecond=0, minute=0, hour=now.hour)
 
@@ -132,11 +153,18 @@ class Calendar():
 
 
     def set_schedule(self):
+        '''
+        This function sets all preparation times in the calendar
+        '''
         self.set_exam_schedule()
         self.set_project_schedule()    
     
 
     def add_to_queue(self, t):
+        '''
+        This function adds a task to its corresponding queue
+        - t: task
+        '''
         if t.activity_type == "Examen":
             self.exam_queue.put(t)
         elif t.activity_type == "Projecte":
@@ -144,6 +172,16 @@ class Calendar():
 
 
     def add_deadline(self, subject, activity_type, name, date, start_time, end_time=None, dedication=None):
+        '''
+        This function adds a study deadline or exam to the system (it adds it to calendar and to the queues)
+        - subject: string
+        - activity_type: exam/project (string)
+        - name: string
+        - date: string
+        - start_time: string
+        - end_time: string
+        - dedication: number of hours needed for the deadline (integer)
+        '''
         if activity_type not in ["Examen", "Projecte"]:
             raise Exception(f"Not a deadline activity")
         if not dedication:
@@ -161,15 +199,24 @@ class Calendar():
 
 
     def get_deadline_list(self):
+        '''
+        This function returns a list of the deadlines
+        '''
         return self.deadlines.queue
 
 
     def get_next_deadlines(self):
+        '''
+        This function returns a list of the next deadlines
+        '''
         deadlines = self.get_deadline_list()
         return deadlines[:10]
         
 
     def save_profile(self):
+        '''
+        This function saves profile features to a file
+        '''
         if not os.path.exists(self.profile_folder):
             os.mkdir(self.profile_folder)
 
