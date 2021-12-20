@@ -219,21 +219,55 @@ class Calendar():
         return deadlines[id_t:min(id_t+10, len(deadlines))]
         
 
-    def save_profile(self):
+    def save_subject_list(self):
         '''
-        This function saves profile features to a file
+        This function saves self.subject_list
+        '''
+        if not os.path.exists(self.profile_folder):
+            os.mkdir(self.profile_folder)
+            
+        with open(f'{self.profile_folder}subject_list.pickle', 'wb') as f:
+            pickle.dump(self.subject_list, f, pickle.HIGHEST_PROTOCOL)
+
+
+    def save_weekly_schedule(self):
+        '''
+        This function saves self.weekly_schedule
         '''
         if not os.path.exists(self.profile_folder):
             os.mkdir(self.profile_folder)
 
-        with open(f'{self.profile_folder}subject_list.pickle', 'wb') as f:
-            pickle.dump(self.subject_list, f, pickle.HIGHEST_PROTOCOL)
-        
         with open(f'{self.profile_folder}weekly_schedule.pickle', 'wb') as f:
             pickle.dump(self.weekly_schedule, f, pickle.HIGHEST_PROTOCOL)
+    
+
+    def save_schedule(self):
+        '''
+        This function saves self.schedule
+        '''
+        if not os.path.exists(self.profile_folder):
+            os.mkdir(self.profile_folder)
 
         with open(f'{self.profile_folder}schedule.pickle', 'wb') as f:
             pickle.dump(self.schedule, f, pickle.HIGHEST_PROTOCOL)
 
+
+    def save_deadlines(self):
+        '''
+        This function saves self.deadlines
+        '''
+        if not os.path.exists(self.profile_folder):
+            os.mkdir(self.profile_folder)
+
         with open(f'{self.profile_folder}deadlines.pickle', 'wb') as f:
             pickle.dump(self.get_deadline_list(), f, pickle.HIGHEST_PROTOCOL)
+
+
+    def save_profile(self):
+        '''
+        This function saves profile features to a file
+        '''
+        self.save_subject_list()
+        self.save_weekly_schedule()
+        self.save_schedule()
+        self.save_deadlines()      
