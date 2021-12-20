@@ -1,4 +1,5 @@
 import base64
+import os.path
 import dash_html_components as html
 
 # App
@@ -84,24 +85,25 @@ def ret_img(activity_type):
     - activity_type: string
     '''
     "Examen", "Projecte", "Estudi", "Fer treball"
+    dir_folder = os.path.dirname(__file__)
     if activity_type == "Examen":
         return html.Img(
-            src=b64_image("img/examen.png"),
+            src=b64_image(f"{dir_folder}/img/examen.png"),
             style={"width": "60%", "text-align": "center"},
         )
     elif activity_type == "Projecte":
         return html.Img(
-            src= b64_image("img/treball.png"),
+            src= b64_image(f"{dir_folder}/img/treball.png"),
             style={"width": "60%", "text-align": "center"},
         )
     elif activity_type == "Estudi":
         return html.Img(
-            src=b64_image("img/estudi.png"),
+            src=b64_image(f"{dir_folder}/img/estudi.png"),
             style={"width": "60%", "text-align": "center"},
         )
     else:
         return html.Img(
-            src=b64_image("img/feina.png"),
+            src=b64_image(f"{dir_folder}/img/feina.png"),
             style={"width": "60%", "text-align": "center"},
         )
 
