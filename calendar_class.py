@@ -209,8 +209,14 @@ class Calendar():
         '''
         This function returns a list of the next deadlines
         '''
+        now = datetime.datetime.now()
         deadlines = self.get_deadline_list()
-        return deadlines[:10]
+        id_t = 0
+        while id_t < len(deadlines):
+            if now <= deadlines[id_t].date_time:
+                break
+            id_t += 1
+        return deadlines[id_t:min(id_t+10, len(deadlines))]
         
 
     def save_profile(self):
