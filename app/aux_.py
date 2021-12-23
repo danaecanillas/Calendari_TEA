@@ -4,6 +4,11 @@ import dash_html_components as html
 # App
 APP_TITLE = "Eina de Suport per la Planificació de les Tasques Acadèmiques"
 
+DIES = ["Dilluns","Dimarts","Dimecres","Dijous","Divendres","Dissabte","Diumenge"]
+
+HORES = []
+for i in range(24):
+    HORES.append(str(i).rjust(2,"0")+":00-"+str((i+1)%24).rjust(2,"0")+":00")
 
 # Page style
 tabs_styles = {
@@ -31,6 +36,10 @@ tab_selected_style = {
 
 # Buttons style 
 red_button_style = {'background-color': 'red',
+                    'padding': '10px',
+                    "width": "100%"}
+
+blue_button_style = {'background-color': 'rgb(136,204,238)',
                     'padding': '10px',
                     "width": "100%"}
 

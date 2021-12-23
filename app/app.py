@@ -28,7 +28,7 @@ calendar.auto_schedule = True
 #########################################################################################
 now = datetime.datetime.now()
 str_date = datetime.datetime.strftime(now, '%Y/%m/%d')
-
+now += datetime.timedelta(hours=2)
 # a = [dash.dependencies.Output('TIME', 'figure')] + [dash.dependencies.Output(f"t{i+1}", 'style') for i in range(len(fruits))]
 if str_date not in calendar.schedule.keys():
     day_tasks = {}
@@ -124,11 +124,36 @@ def register(submit_entry, select_subject, select_activity, enter_task, enter_ho
 # ---------------------------------------------------------------------------------------
 # Today tab
 # ---------------------------------------------------------------------------------------
-@app.callback(dash.dependencies.Output('label1', 'children'),
+
+@app.callback([dash.dependencies.Output('label1', 'children'),dash.dependencies.Output("TASQUES", "children"),],
     [dash.dependencies.Input('interval1', 'n_intervals')])
 def update_interval(n):
     now = datetime.datetime.now()
-    return str(now.strftime("%H:%M:%S"))
+    now += datetime.timedelta(hours=2)
+    f_now = str(now.strftime("%H:%M:%S"))
+    global day_tasks
+    day_tasks = calendar.schedule[str_date]
+    hours = sorted(day_tasks.keys())
+
+    lst = []
+    for hour in hours:
+        check_task = hour[0:2]
+        check_hour = f_now[0:2]
+        if check_task == check_hour:
+            style_B = aux.blue_button_style
+        else:
+            style_B = aux.normal_button_style 
+        task = day_tasks[hour]
+    # for hour, task in day_tasks.items():
+        lst.append(
+            html.Div([
+                html.Button(hour + " | "+ task.name + " - "+ task.subject, id=str(task.date_time), style=style_B),
+                html.Br(),
+                html.Br()
+            ])
+        )
+
+    return str(now.strftime("%H:%M:%S")), html.Div(lst)
 
 @app.callback(
     [
@@ -200,6 +225,31 @@ for dia, hores in profile.horari.items():
             else:
                 return aux.normal_button_style
 
+@app.callback(Output('tab-content-profile', 'children'),
+              Input('tab-perfil', 'value'))
+def render_content(tab):
+    if tab == 'tab-esdeveniment':
+        return html.Div([
+            html.H3('Tab content 1'),
+        ])
+    elif tab == 'tab-assignatures':
+        return html.Div([
+            html.H3('Tab content 2'),
+        ])
+    elif tab == 'tab-disponibilitat':
+        lst=[]
+        i = 0
+        lst.append(html.Div([html.Div([html.H2("Disponibilitat horària")],style={'width':'70%','text-align':'left'}),html.Div([html.Button("Guardar", id="save_disponibilitat",
+                    n_clicks=0,style=aux.normal_button_style)],style={'width':'30%','text-align':'rigth'})], style = {'display':'flex','text-align':'center','marginLeft': "20%"}))
+        for dia, hores in profile.horari.items():
+            lst.append(html.H3(aux.DIES[i]))
+            for hora in hores:   
+                lst.append(html.Div([html.Button(hora, id=dia+hora,
+                    n_clicks=0,style=aux.normal_button_style)], style = {'display': 'inline-block'}))
+            lst.append(html.Br())
+            i+=1
+        return html.Div(lst,style={'marginLeft': "14%",'marginRight': "14%"})
+
 # ---------------------------------------------------------------------------------------
 # Deadlines tab
 # ---------------------------------------------------------------------------------------
@@ -218,23 +268,9 @@ def render_content(tab):
                 html.Div([html.H1("No tens res a fer avui!")], style={'text-align':'center'}), 
                 html.Img(src=aux.b64_image("img/felicitats!.png"))
             ], style={'height':'70%','text-align':'center'})
-        
-        global day_tasks
-        day_tasks = calendar.schedule[str_date]
-        hours = sorted(day_tasks.keys())
-
-        for hour in hours:
-            task = day_tasks[hour]
-        # for hour, task in day_tasks.items():
-            lst.append(
-                html.Div([
-                    html.Button(hour + " | "+ task.name + " - "+ task.subject, id=str(task.date_time), style=aux.normal_button_style),
-                    html.Br(),
-                    html.Br()
-                ])
-            )
 
         ACTIVITAT = []
+        TASQUES = []
 
         time = str(now.strftime("%H:%M:%S"))[0:2]
         hour = time+":00"
@@ -245,7 +281,7 @@ def render_content(tab):
                     html.Div([
                         html.Div([
                             html.H2("Les tasques d'avui:"),
-                            html.Div(lst)
+                            html.Div(id="TASQUES", children=''),
                         ], style={'marginLeft': "5%",'marginRight': "5%"})
                     ], style={'width':'40%','text-align':'left','backgroundColor': 'rgb(153,153,153)','marginTop': 22,'marginLeft': 10}),
                     html.Div([
