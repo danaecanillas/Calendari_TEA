@@ -264,9 +264,10 @@ def render_content(tab):
         lst=[]
 
         if str_date not in calendar.schedule.keys():
+            dir_folder = os.path.dirname(__file__)
             return html.Div([
                 html.Div([html.H1("No tens res a fer avui!")], style={'text-align':'center'}), 
-                html.Img(src=aux.b64_image("img/felicitats!.png"))
+                html.Img(src=aux.b64_image(f"{dir_folder}/img/felicitats!.png"))
             ], style={'height':'70%','text-align':'center'})
 
         ACTIVITAT = []
