@@ -87,40 +87,66 @@ class Calendar():
         return str_date not in self.schedule.keys() or str_clock not in self.schedule[str_date].keys()
 
 
+    def set_study_periode(self, exam, now, first_slot, last_slot):
+        '''
+        This function sets study times for an exam between 2 timestamps
+        - exam: exam to be set (Task)
+        - now: current time (datetime.datetime)
+        - first_slot: first slot in chronological time where we try to set study time (last to be tried)
+        - last_slot: last slot in chronological time where we try to set study time (first to be tried)
+        '''
+        time_slot = last_slot
+        
+        while time_slot > now and time_slot >= first_slot:
+            if exam.dedication == 0:
+                return time_slot
+            if self.free_weekly_slot(time_slot) and self.free_calendar_slot(time_slot):
+                # subtask creation:
+                sub_t = deepcopy(exam)
+                sub_t.activity_type = "Estudi"
+                sub_t.dedication = 1
+                sub_t.date_time = time_slot
+                self.add_to_calendar(sub_t)
+                exam.dedication -= 1
+            time_slot -= datetime.timedelta(hours = 1)
+                
+        if time_slot < now:
+            # raise Exception(f"La tasca no es podrà fer. Caldrà afegir hores a l'horari.")
+            print(f"No dóna temps a estudiar tots els exàmens. Caldrà afegir hores a l'horari.")
+            return -1
+        return 0 # time_slot < first_slot
+        
+
     def set_exam_schedule(self):
         '''
         This function sets study times in the calendar
         '''
+        exams = self.exam_queue.queue
+        exams = sorted(exams)
         now = datetime.datetime.now()
 
-        if not self.exam_queue.empty():
-            t = self.exam_queue.get()
-            date_schedule = t.date_time # date of the last exam
-            self.add_to_queue(t)
-
-        while not self.exam_queue.empty():
-            # print("mida cua exam", self.exam_queue.qsize())
-            t = self.exam_queue.get()
-            # print("selected exam is", t.name, "pending hours:", t.dedication)
-            date_schedule = min(date_schedule, t.date_time-datetime.timedelta(hours = 1))
-            possible = False
-            while date_schedule > now and not possible:
-                # print(date_schedule)
-                date_schedule -= datetime.timedelta(hours = 1)
-                possible = self.free_weekly_slot(date_schedule) and self.free_calendar_slot(date_schedule)
-            if not possible:
-                print("La tasca no es podrà fer. Caldrà afegir hores a l'horari.")
+        ex_it = 0
+        while ex_it < len(exams):
+            last_slot = exams[ex_it].date_time - datetime.timedelta(hours = 2) # we leave the hour before the exam empty
+            if ex_it == len(exams)-1:
+                first_slot = now
             else:
-                # subtask creation:
-                sub_t = deepcopy(t)
-                sub_t.activity_type = "Estudi"
-                sub_t.dedication = 1
-                sub_t.date_time = date_schedule
-                self.add_to_calendar(sub_t)
+                first_slot = exams[ex_it+1].date_time + datetime.timedelta(hours = 5) # we start studying 5 hours after the exam before
 
-                t.dedication -= 1
-                if t.dedication != 0:
-                    self.add_to_queue(t)
+            exam = exams[ex_it]
+            res = self.set_study_periode(exam, now, first_slot, last_slot)
+
+            # filling up the available time after first_slot (if there is) with pending study time from future exams:
+            aux_it = 0
+            while type(res) == datetime.datetime and aux_it < ex_it:
+                exam = exams[aux_it]
+                res = self.set_study_periode(exam, now, first_slot, res)
+                aux_it += 1
+            if res == -1:
+                return False
+            ex_it += 1
+
+        return True
 
 
     def set_project_schedule(self):
@@ -132,13 +158,12 @@ class Calendar():
 
         while not self.project_queue.empty():
             t = self.project_queue.get()
-            # print("selected project is", t.name, "pending hours:", t.dedication)
             possible = False
             while date_schedule < t.date_time and not possible:
                 date_schedule += datetime.timedelta(hours = 1)
                 possible = self.free_weekly_slot(date_schedule) and self.free_calendar_slot(date_schedule)
             if not possible:
-                print("La tasca no es podrà fer. Caldrà afegir hores a l'horari.")
+                print(f"La tasca {t.name} de l'assignatura de {t.subject} no es podrà fer. Caldrà afegir hores a l'horari.")
             else:
                 # subtask creation:
                 sub_t = deepcopy(t)
