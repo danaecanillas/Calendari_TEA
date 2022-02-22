@@ -292,7 +292,6 @@ def render_content(tab):
                         ],
                         style={"width": "20%", "text-align": "rigth"},
                     ),html.Br(),dcc.Dropdown(
-                    value='Dilluns',
             options=[
                 {'label': 'Dilluns', 'value': 'Dilluns'},
                 {'label': 'Dimarts', 'value': 'Dimarts'},
@@ -301,7 +300,7 @@ def render_content(tab):
                 {'label': 'Divendres', 'value': 'Divendres'},
                 {'label': 'Dissabte', 'value': 'Dissabte'},
                 {'label': 'Diumenge', 'value': 'Diumenge'}
-            ],clearable=False,id="dia_setmana"
+            ],clearable=False,id="dia_setmana",placeholder="Selecciona un dia"
         ),html.Br()], id="tab_com"))
         for hora in aux.HORES:   
             lst.append(html.Div([html.Button(hora, id=hora,
@@ -313,7 +312,7 @@ def render_content(tab):
 def holidays():
     HORES = [str(i).rjust(2,"0")+":00-"+str((i+1)%24).rjust(2,"0")+":00" for i in range(24)]
 
-    colorscale=[[0, '#fff'], [1, '#76cf63']]
+    colorscale=[[False, "#eeeeee"], [True, "#76cf63"]]
 
     data = [
     go.Heatmap(
@@ -403,4 +402,4 @@ def render_content(tab):
         return deadlines.deadlines_tab(calendar)
 
 if __name__ == '__main__':
-    app.run_server(debug='True')
+    app.run_server(debug=True)
