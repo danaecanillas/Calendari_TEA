@@ -1,6 +1,8 @@
 import base64
 import os.path
-import dash_html_components as html
+from dash import html
+from dash import dcc
+import numpy as np
 
 # App
 APP_TITLE = "Eina de Suport per la Planificació de les Tasques Acadèmiques"
@@ -10,6 +12,8 @@ DIES = ["Dilluns","Dimarts","Dimecres","Dijous","Divendres","Dissabte","Diumenge
 HORES = []
 for i in range(24):
     HORES.append(str(i).rjust(2,"0")+":00-"+str((i+1)%24).rjust(2,"0")+":00")
+
+DISPONIBILITAT = np.zeros((7, len(HORES)))
 
 # Page style
 tabs_styles = {
@@ -48,6 +52,10 @@ normal_button_style ={
     'padding': '10px',
     "width": "100%"
 }
+
+green_button_style = {'background-color': '#76cf63',
+                    'padding': '9px',
+                    "width": "100%"}
 
 ended_button_style ={
     'background-color': 'rgb(153,153,153)',

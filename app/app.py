@@ -1,12 +1,17 @@
 # Dash
 import dash
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html
+from dash import dcc
 from dash.dependencies import Input, Output, State
 import plotly.express as px
 import pandas as pd
 import os, sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import plotly.graph_objs as go
+import numpy as np
+import random
 
 # Python scripts
 import aux_ as aux
@@ -34,6 +39,8 @@ if str_date not in calendar.schedule.keys():
     day_tasks = {}
 else:
     day_tasks = calendar.schedule[str_date]
+
+DISPONIBILITAT = pd.DataFrame(aux.DISPONIBILITAT, index=['Diumenge',"Dissabte","Divendres","Dijous","Dimecres","Dimarts","Dilluns"])
 #########################################################################################
 
 #########################################################################################
@@ -216,14 +223,41 @@ def time_clock(time):
 # ---------------------------------------------------------------------------------------
 # Profile tab
 # ---------------------------------------------------------------------------------------
-for dia, hores in profile.horari.items():
-    for hora in hores: 
-        @app.callback(Output('%s' % dia+hora, 'style'), [Input('%s' % dia+hora, 'n_clicks')])
-        def change_button_style(n_clicks):
-            if n_clicks%2 != 0:
-                return aux.red_button_style
-            else:
-                return aux.normal_button_style
+for hora in aux.HORES: 
+    @app.callback(Output('%s' % hora, 'style'), [Input('%s' % hora, 'n_clicks')])
+    def change_button_style(n_clicks):
+        if n_clicks%2 != 0:
+            print(n_clicks)
+            return aux.green_button_style
+        else:
+            return aux.normal_button_style
+
+        
+@app.callback(
+    Output('tab-perfil', "value"),
+    [Input("save_disponibilitat", "n_clicks")],
+    [
+        State("dia_setmana", 'value'), 
+        State('00:00-01:00', 'n_clicks'), State('01:00-02:00', 'n_clicks'), State('02:00-03:00', 'n_clicks'),
+        State('03:00-04:00', 'n_clicks'), State('04:00-05:00', 'n_clicks'), State('05:00-06:00', 'n_clicks'),
+        State('06:00-07:00', 'n_clicks'), State('07:00-08:00', 'n_clicks'), State('08:00-09:00', 'n_clicks'),
+        State('09:00-10:00', 'n_clicks'), State('10:00-11:00', 'n_clicks'), State('11:00-12:00', 'n_clicks'),
+        State('12:00-13:00', 'n_clicks'), State('13:00-14:00', 'n_clicks'), State('14:00-15:00', 'n_clicks'),
+        State('15:00-16:00', 'n_clicks'), State('16:00-17:00', 'n_clicks'), State('17:00-18:00', 'n_clicks'),
+        State('18:00-19:00', 'n_clicks'), State('19:00-20:00', 'n_clicks'), State('20:00-21:00', 'n_clicks'),
+        State('21:00-22:00', 'n_clicks'), State('22:00-23:00', 'n_clicks'), State('23:00-00:00', 'n_clicks'),
+    ],
+)
+def register(submit_entry, day, state0, state1, state2, state3, state4, state5, state6, state7, state8, state9,
+            state10, state11, state12, state13, state14, state15, state16, state17, state18, state19, state20,
+            state21, state22, state23):
+    if submit_entry:
+        DISPONIBILITAT.loc[day] = [state0%2, state1%2, state2%2, state3%2, state4%2, state5%2, state6%2, state7%2, state8%2, state9%2,
+            state10%2, state11%2, state12%2, state13%2, state14%2, state15%2, state16%2, state17%2, state18%2, state19%2, state20%2,
+            state21%2, state22%2, state23%2]
+        return 'tab-perfil'
+    else:
+        return 'tab-perfil'
 
 @app.callback(Output('tab-content-profile', 'children'),
               Input('tab-perfil', 'value'))
@@ -239,16 +273,78 @@ def render_content(tab):
     elif tab == 'tab-disponibilitat':
         lst=[]
         i = 0
-        lst.append(html.Div([html.Div([html.H2("Disponibilitat horària")],style={'width':'70%','text-align':'left'}),html.Div([html.Button("Guardar", id="save_disponibilitat",
-                    n_clicks=0,style=aux.normal_button_style)],style={'width':'30%','text-align':'rigth'})], style = {'display':'flex','text-align':'center','marginLeft': "20%"}))
-        for dia, hores in profile.horari.items():
-            lst.append(html.H3(aux.DIES[i]))
-            for hora in hores:   
-                lst.append(html.Div([html.Button(hora, id=dia+hora,
-                    n_clicks=0,style=aux.normal_button_style)], style = {'display': 'inline-block'}))
-            lst.append(html.Br())
-            i+=1
+        lst.append(html.Div([html.H2("Disponibilitat horària")]))
+        # for dia, hores in profile.horari.items():
+        #     lst.append(html.H3(aux.DIES[i]))
+        #     for hora in hores:   
+        #         lst.append(html.Div([html.Button(hora, id=dia+hora,
+        #             n_clicks=0,style=aux.normal_button_style)], style = {'display': 'inline-block'}))
+        #     lst.append(html.Br())
+        #     i+=1
+        lst.append(html.Div([dcc.Graph(id='dispo_horaria', figure=holidays(), config={'displayModeBar': False}),html.Br(), html.Div(
+                        [
+                            html.Button(
+                                "Actualitza la Disponibilitat",
+                                id="save_disponibilitat",
+                                n_clicks=0,
+                                style=aux.normal_button_style,
+                            )
+                        ],
+                        style={"width": "20%", "text-align": "rigth"},
+                    ),html.Br(),dcc.Dropdown(
+                    value='Dilluns',
+            options=[
+                {'label': 'Dilluns', 'value': 'Dilluns'},
+                {'label': 'Dimarts', 'value': 'Dimarts'},
+                {'label': 'Dimecres', 'value': 'Dimecres'},
+                {'label': 'Dijous', 'value': 'Dijous'},
+                {'label': 'Divendres', 'value': 'Divendres'},
+                {'label': 'Dissabte', 'value': 'Dissabte'},
+                {'label': 'Diumenge', 'value': 'Diumenge'}
+            ],clearable=False,id="dia_setmana"
+        ),html.Br()], id="tab_com"))
+        for hora in aux.HORES:   
+            lst.append(html.Div([html.Button(hora, id=hora,
+                n_clicks=0,style=aux.normal_button_style)], style = {'display': 'inline-block'}))
+        lst.append(html.Br())
+        i+=1
         return html.Div(lst,style={'marginLeft': "14%",'marginRight': "14%"})
+
+def holidays():
+    HORES = [str(i).rjust(2,"0")+":00-"+str((i+1)%24).rjust(2,"0")+":00" for i in range(24)]
+
+    colorscale=[[0, '#fff'], [1, '#76cf63']]
+
+    data = [
+    go.Heatmap(
+    z = DISPONIBILITAT,
+    xgap=3, # this
+    ygap=3, # and this is used to make the grid-like apperance
+    showscale=False,
+    colorscale=colorscale
+    )
+    ]
+    layout = go.Layout(
+    height=280,
+    yaxis=dict(
+    showline = False, showgrid = False, zeroline = False,
+    tickmode='array',
+    ticktext=['Diumenge',"Dissabte","Divendres","Dijous","Dimecres","Dimarts","Dilluns"],
+    tickvals=[0,1,2,3,4,5,6],
+    ),
+    xaxis=dict(
+    showline = False, showgrid = False, zeroline = False,
+    tickmode='array',
+    ticktext=HORES,
+    tickvals=list(range(0, len(HORES)))
+    ),
+    font={'size':10, 'color':'#9e9e9e'},
+    plot_bgcolor=('#fff'),
+    margin = dict(t=40),
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    return fig
 
 # ---------------------------------------------------------------------------------------
 # Deadlines tab
@@ -307,4 +403,4 @@ def render_content(tab):
         return deadlines.deadlines_tab(calendar)
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug='True')
