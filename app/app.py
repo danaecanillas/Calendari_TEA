@@ -1,7 +1,8 @@
 # Dash
+from re import S
 import dash
 from dash import html
-from dash import dcc
+from dash import dcc, dash_table
 from dash.dependencies import Input, Output, State
 import plotly.express as px
 import pandas as pd
@@ -26,6 +27,8 @@ from calendar_class import Calendar
 #########################################################################################
 calendar = Calendar("Simon")
 calendar.auto_schedule = True
+
+ASSIGNATURES = []
 #########################################################################################
 
 #########################################################################################
@@ -124,7 +127,8 @@ def register(submit_entry, select_subject, select_activity, enter_task, enter_ho
             enter_time,
             dedication=enter_hours,
         )
-        print(calendar.get_schedule())
+        #print(calendar.get_schedule())
+        print(calendar.weekly_schedule)
         return "today"
     raise dash.exceptions.PreventUpdate
 
@@ -223,6 +227,16 @@ def time_clock(time):
 # ---------------------------------------------------------------------------------------
 # Profile tab
 # ---------------------------------------------------------------------------------------
+def profile_tab():
+    return html.Div([
+       dcc.Tabs(id="tab-perfil", value='tab-perfil', children=[
+           dcc.Tab(label='Afegeix esdeveniment', value='tab-esdeveniment'),
+           dcc.Tab(label='Assignatures', value='tab-assignatures'),
+           dcc.Tab(label='Disponibilitat Horària', value='tab-disponibilitat'),
+        ]), 
+        html.Div(id='tab-content-profile')
+    ])
+
 for hora in aux.HORES: 
     @app.callback(Output('%s' % hora, 'style'), [Input('%s' % hora, 'n_clicks')])
     def change_button_style(n_clicks):
@@ -255,9 +269,15 @@ def register(submit_entry, day, state0, state1, state2, state3, state4, state5, 
         DISPONIBILITAT.loc[day] = [state0%2, state1%2, state2%2, state3%2, state4%2, state5%2, state6%2, state7%2, state8%2, state9%2,
             state10%2, state11%2, state12%2, state13%2, state14%2, state15%2, state16%2, state17%2, state18%2, state19%2, state20%2,
             state21%2, state22%2, state23%2]
-        return 'tab-perfil'
+
+        disp = np.fliplr(np.transpose(DISPONIBILITAT))
+
+        calendar.weekly_schedule = disp
+
+        return 'tab-disponibilitat'
     else:
-        return 'tab-perfil'
+        return 'tab-disponibilitat'
+
 
 @app.callback(Output('tab-content-profile', 'children'),
               Input('tab-perfil', 'value'))
@@ -267,9 +287,9 @@ def render_content(tab):
             html.H3('Tab content 1'),
         ])
     elif tab == 'tab-assignatures':
-        return html.Div([
-            html.H3('Tab content 2'),
-        ])
+
+        return prova()
+
     elif tab == 'tab-disponibilitat':
         lst=[]
         i = 0
@@ -345,6 +365,82 @@ def holidays():
     fig = go.Figure(data=data, layout=layout)
     return fig
 
+
+@app.callback(
+    Output('adding-rows-table', 'data'),
+    Input('editing-rows-button', 'n_clicks'),Input('tab-perfil', 'value'),
+    State('adding-rows-table', 'data'),State('assiggg', 'value'),)
+def add_row(n_clicks, _, df, asig):
+    if n_clicks > 0:
+        print("CLICK")
+        print(df)
+        df.append({'tasques': asig})
+        calendar.subject_list.append(asig)
+        global ASSIGNATURES
+        ASSIGNATURES = calendar.subject_list
+        print(calendar.subject_list)
+    return df
+
+@app.callback(Output('tab-assignatures', "value"),
+              [Input('adding-rows-table', 'data_previous')],
+              [State('adding-rows-table', 'data')])
+def show_removed_rows(previous, current):
+    if previous is None:
+        dash.exceptions.PreventUpdate()
+    else:
+        l = []
+        for el in current:
+            l.append(el['tasques'])
+        
+        calendar.subject_list = l
+        global ASSIGNATURES
+        ASSIGNATURES = calendar.subject_list
+
+        dir_folder = os.path.dirname(__file__)
+        df = pd.DataFrame({
+            'tasques': calendar.subject_list,
+        })
+        return prova()
+
+def prova():
+    dir_folder = os.path.dirname(__file__)
+
+    df = pd.DataFrame({
+        'tasques': calendar.subject_list,
+    })
+    return html.Div([
+                html.Div([
+                    html.Div([
+                        html.Div([
+                            html.H2("Llista d'assignatures:"),
+                            dash_table.DataTable(
+                                id='adding-rows-table',
+                                data=df.to_dict(orient='records'),
+                                editable=True,
+                                row_deletable=True,
+                                style_as_list_view=True,
+                                style_header = {'display': 'none'},
+                                style_data= {'font-size': '13px', 'font-family':'Helvetica','padding': '10px'}
+                                #fixed_rows={'headers': True},
+                                #style_table={'height': 500}  # defaults to 500
+                        ), html.Br(),html.Br(),html.Br(),
+                            html.Div(id="TASQUES", children=''),dcc.Input(
+            id="assiggg",
+            type="text",
+            placeholder="Escriu el nom de l'assignatura",
+            style={'width':'82%','height': '20px','marginRight': 10, 'font-size': '13px','padding': '10px'}
+        ),html.Button("Afegeix", id='editing-rows-button', n_clicks=0, style={'width':'12%','height': '40px','font-size': '13px','padding': '10px'}),
+                        ], style={'marginLeft': "5%",'marginRight': "5%"})
+                    ], style={'height': '500px','width':'40%','text-align':'left','backgroundColor': 'rgb(136,204,238)','marginTop': 22,'marginLeft': 10}),
+                html.Div([html.Div([
+ 
+                html.Img(src=aux.b64_image(f"{dir_folder}/img/assignatures.png"))
+            ], style={'height':'70%','text-align':'center'})],style={'marginLeft': "5%",'marginRight': "5%"})], style={'display':'flex','text-align':'center','marginLeft': "5%",'marginRight': "5%"})
+            ])
+
+
+
+        
 # ---------------------------------------------------------------------------------------
 # Deadlines tab
 # ---------------------------------------------------------------------------------------
@@ -395,9 +491,10 @@ def render_content(tab):
         return today_tasks
                 
     elif tab == 'add_task':
-        return tasks.tasks_tab()
+        ASSIGNATURES = calendar.subject_list
+        return tasks.tasks_tab(ASSIGNATURES)
     elif tab == 'profile':
-        return profile.profile_tab()
+        return profile_tab()
     elif tab == 'deadlines':
         return deadlines.deadlines_tab(calendar)
 
